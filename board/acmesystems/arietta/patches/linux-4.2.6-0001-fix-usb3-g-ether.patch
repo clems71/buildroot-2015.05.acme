@@ -1,0 +1,13 @@
+diff --git a/drivers/usb/gadget/udc/atmel_usba_udc.c b/drivers/usb/gadget/udc/atmel_usba_udc.c
+index f0f2b06..f92f5af 100644
+--- a/drivers/usb/gadget/udc/atmel_usba_udc.c
++++ b/drivers/usb/gadget/udc/atmel_usba_udc.c
+@@ -1633,7 +1633,7 @@ static irqreturn_t usba_udc_irq(int irq, void *devid)
+ 	spin_lock(&udc->lock);
+
+ 	int_enb = usba_int_enb_get(udc);
+-	status = usba_readl(udc, INT_STA) & int_enb;
++	status = usba_readl(udc, INT_STA) & (int_enb | USBA_HIGH_SPEED);
+ 	DBG(DBG_INT, "irq, status=%#08x\n", status);
+
+ 	if (status & USBA_DET_SUSPEND) {

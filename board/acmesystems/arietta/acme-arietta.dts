@@ -1,26 +1,22 @@
 /*
  * acme-arietta.dts - Device Tree file for Arietta G25
- * Copyright (C) 2015 Sergio Tanzilli <sergio@tanzilli.com>
  *
- * Licensed under GPLv2 or later. 
  */
+ 
 /dts-v1/;
 #include "at91sam9g25.dtsi"
+
 / {
 	model = "Acme Systems Arietta G25";
-	compatible = "acme,ariettag25", "atmel,at91sam9x5ek","atmel,at91sam9x5", "atmel,at91sam9";
+	compatible = "acme,ariettag25", "atmel,at91sam9x5", "atmel,at91sam9";
+
 	aliases {
 		serial0 = &dbgu;
-		serial1 = &usart0;
-		serial2 = &usart1;
-		serial3 = &usart2;
-		serial4 = &usart3;
-		serial5 = &uart0;
-		serial6 = &uart1;
 	};
 
 	chosen {
-		bootargs = "mem=128M console=ttyS0,115200 root=/dev/mmcblk0p2 rootfstype=ext4 rootwait consoleblank=0";
+		stdout-path = "serial0:115200n8";
+		bootargs = "console=ttyS0,115200 root=/dev/mmcblk0p2 rw rootwait";
 	};
 
 	memory {
@@ -28,17 +24,12 @@
 	};
 
 	clocks {
-		#address-cells = <1>;
-		#size-cells = <1>;
-		ranges;
-		main_clock: clock@0 {
-			compatible = "atmel,osc", "fixed-clock";
+		slow_xtal {
+			clock-frequency = <32768>;
+		};
+		main_xtal {
 			clock-frequency = <12000000>;
 		};
-
-		main_xtal { 
-			clock-frequency = <12000000>; 
-		}; 
 	};
 
 	ahb {
@@ -53,57 +44,55 @@
 					bus-width = <4>;
 				};
 			};
-			i2c0: i2c@f8010000 {
-				status ="disabled";
-				wm8731: wm8731@1b {
-					compatible = "wm8731";
-					reg = <0x1b>;
-				};
-			};
 			i2c1: i2c@f8014000 {
-				status ="disabled";
+				status ="okay";
 			};
 			usart0: serial@f801c000 {
 				pinctrl-0 = <&pinctrl_usart0>;
-				status ="disabled";
+				status ="okay";
 			};
 			usart1: serial@f8020000 {
-				pinctrl-0 = <&pinctrl_usart1 &pinctrl_usart1_rts &pinctrl_usart1_cts>;
-				status ="disabled";
-			};
-			usart2: serial@f8024000 {
-				pinctrl-0 = <&pinctrl_usart2>;
-				status ="disabled";
+				pinctrl-0 = <&pinctrl_usart1>;
+				status ="okay";
 			};
 			spi1: spi@f0004000 {
-				status = "disabled";
+				status = "okay";
 				cs-gpios = <&pioA 8 0>, <&pioA 0 0>, <&pioA 31 0>, <&pioA 30 0>;
-				device@0 {
-					compatible = "spidev";
-					spi-max-frequency = <50000000>;	    // 50 MHz
-					reg = <0>;
-				};
-				device@1 {
-					compatible = "spidev";
-					spi-max-frequency = <50000000>;	    // 50 MHz
-					reg = <1>;
-				};
 				device@2 {
 					compatible = "spidev";
-					spi-max-frequency = <50000000>;	    // 50 MHz
+					spi-max-frequency = <5000000>;	    // 5 MHz
 					reg = <2>;
 				};
 				device@3 {
 					compatible = "spidev";
-					spi-max-frequency = <50000000>;	    // 50 MHz
+					spi-max-frequency = <5000000>;	    // 5 MHz
 					reg = <3>;
 				};
 			};
 
+			pinctrl@fffff400 {
+				adc0 {
+					pinctrl_adc0_ad0: adc0_ad0 {
+						atmel,pins = <AT91_PIOB 11 AT91_PERIPH_GPIO AT91_PINCTRL_NONE>;
+					};
+					pinctrl_adc0_ad1: adc0_ad1 {
+						atmel,pins = <AT91_PIOB 12 AT91_PERIPH_GPIO AT91_PINCTRL_NONE>;
+					};
+					pinctrl_adc0_ad2: adc0_ad2 {
+						atmel,pins = <AT91_PIOB 13 AT91_PERIPH_GPIO AT91_PINCTRL_NONE>;
+					};
+						pinctrl_adc0_ad3: adc0_ad3 {
+						atmel,pins = <AT91_PIOB 14 AT91_PERIPH_GPIO AT91_PINCTRL_NONE>;
+					};
+				};
+			};
+			
 			adc0: adc@f804c000 {
-				status = "disabled";
+				status = "okay";
+				pinctrl-names = "default";
+				pinctrl-0 = <&pinctrl_adc0_ad0 &pinctrl_adc0_ad1    >;
 				atmel,adc-channels-used = <0xf>;
-				atmel,adc-num-channels = <4>;
+				atmel,adc-num-channels = <2>;
 				compatible = "atmel,at91sam9x5-adc";
 				atmel,adc-startup-time = <40>;
 				atmel,adc-status-register = <0x1c>;
@@ -121,23 +110,32 @@
 
 			pinctrl@fffff400 {
 				pwm0 {
-					pinctrl_pwm0: pwm0-0 {
+					pinctrl_pwm0_0: pwm0_0-0 {
 						atmel,pins =
-						< AT91_PIOB 11 AT91_PERIPH_B AT91_PINCTRL_NONE
-						  AT91_PIOB 12 AT91_PERIPH_B AT91_PINCTRL_NONE
-						  AT91_PIOB 13 AT91_PERIPH_B AT91_PINCTRL_NONE
-						  AT91_PIOB 14 AT91_PERIPH_B AT91_PINCTRL_NONE >;
+							< AT91_PIOB 11 AT91_PERIPH_B AT91_PINCTRL_NONE>;
+					};
+					pinctrl_pwm0_1: pwm0_1-0 {
+						atmel,pins =
+							< AT91_PIOB 12 AT91_PERIPH_B AT91_PINCTRL_NONE>;
+					};
+					pinctrl_pwm0_2: pwm0_2-0 {
+						atmel,pins =
+							< AT91_PIOB 13 AT91_PERIPH_B AT91_PINCTRL_NONE>;
+					};
+					pinctrl_pwm0_3: pwm0_3-0 {
+						atmel,pins =
+							< AT91_PIOB 14 AT91_PERIPH_B AT91_PINCTRL_NONE>;
 					};
 				};
 			};
 			pwm0: pwm@f8034000 {
 				pinctrl-names = "default";
-				pinctrl-0 = <&pinctrl_pwm0>;
-				status = "disabled";
+				pinctrl-0 = <    &pinctrl_pwm0_2 &pinctrl_pwm0_3>;
+				status = "okay";
 			};
 
 			ssc0: ssc@f0010000 {
-				status = "disabled";
+				status = "okay";
 			};
 			usb2: gadget@f803c000 {
 				status = "okay";
@@ -167,16 +165,4 @@
 			linux,default-trigger = "heartbeat";
 		};
 	};
-	sound {
-		compatible = "atmel,sam9x5-wm8731-audio";
-		atmel,model = "wm8731 @ AT91SAM9X5EK";
-		atmel,audio-routing =
-		"Headphone Jack", "RHPOUT",
-		"Headphone Jack", "LHPOUT",
-		"LLINEIN", "Line In Jack",
-		"RLINEIN", "Line In Jack";
-		atmel,ssc-controller = <&ssc0>;
-		atmel,audio-codec = <&wm8731>;
-	};
-
 };
