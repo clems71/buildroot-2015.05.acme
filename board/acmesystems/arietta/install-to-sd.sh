@@ -1,4 +1,4 @@
-cp output/images/acme-arietta.dtb /media/$USER/boot/
-cp output/images/boot.bin /media/$USER/boot/
-cp output/images/zImage /media/$USER/boot/
-tar xf output/images/rootfs.tar -C /media/$USER/rootfs
+cp output/images/acme-arietta.dtb $MNT_DIR/boot/
+cp output/images/boot.bin $MNT_DIR/boot/
+cp output/images/zImage $MNT_DIR/boot/
+tar xf output/images/rootfs.tar -C $MNT_DIR/rootfs
